@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Clear screen before starting
+# #clear screen before starting
 clear
 
 # Define colors
@@ -13,7 +13,7 @@ NC='\e[0m' # No Color
 
 # Function to update script
 update_script() {
-    clear
+    #clear
     echo -e "${YELLOW}Checking for script updates...${NC}"
     SCRIPT_PATH=$(realpath "$0")
     TEMP_SCRIPT="/tmp/docker_update.sh"
@@ -37,7 +37,7 @@ update_script() {
 
 # Function to show menu
 echo_menu() {
-    clear
+    #clear
     echo -e "${CYAN}Select an option:${NC}"
     echo -e "${GREEN}1) List all running containers${NC}"
     echo -e "${GREEN}2) List all stopped containers${NC}"
@@ -60,37 +60,37 @@ while true; do
     read choice
     case "$choice" in
         1)
-            clear
+            #clear
             echo -e "${GREEN}Listing all running Docker containers...${NC}"
             docker ps
             ;;
         2)
-            clear
+            #clear
             echo -e "${GREEN}Listing all stopped Docker containers...${NC}"
             docker ps -a --filter "status=exited"
             ;;
         3)
-            clear
+            #clear
             echo -e "${GREEN}Listing all Docker volumes...${NC}"
             docker volume ls
             ;;
         4)
-            clear
+            #clear
             echo -e "${YELLOW}Starting all Docker containers...${NC}"
             docker start $(docker ps -aq)
             ;;
         5)
-            clear
+            #clear
             echo -e "${YELLOW}Stopping all Docker containers...${NC}"
             docker stop $(docker ps -q)
             ;;
         6)
-            clear
+            #clear
             echo -e "${YELLOW}Restarting all Docker containers...${NC}"
             docker restart $(docker ps -q)
             ;;
         7)
-            clear
+            #clear
             if [ -n "$(docker ps -aq)" ]; then
                 echo -e "${RED}Removing all stopped containers...${NC}"
                 docker rm $(docker ps -aq)
@@ -99,7 +99,7 @@ while true; do
             fi
             ;;
         8)
-            clear
+            #clear
             if [ -n "$(docker volume ls -q)" ]; then
                 echo -e "${RED}Removing all unused Docker volumes...${NC}"
                 docker volume prune -f
@@ -108,7 +108,7 @@ while true; do
             fi
             ;;
         9)
-            clear
+            #clear
             if [ -n "$(docker images -q -f "dangling=true")" ]; then
                 echo -e "${RED}Removing unused Docker images...${NC}"
                 docker image prune -af
@@ -117,12 +117,12 @@ while true; do
             fi
             ;;
         10)
-            clear
+            #clear
             echo -e "${RED}Pruning entire Docker system (containers, networks, images, build cache)...${NC}"
             docker system prune -af
             ;;
         11)
-            clear
+            #clear
             echo -e "${YELLOW}Checking current SELinux status...${NC}"
             sestatus
             echo -e "${YELLOW}Setting SELinux to permissive mode...${NC}"
@@ -138,12 +138,12 @@ while true; do
             update_script
             ;;
         0)
-            clear
+            #clear
             echo -e "${BLUE}Exiting...${NC}"
             exit 0
             ;;
         *)
-            clear
+            #clear
             echo -e "${RED}Invalid option. Please try again.${NC}"
             ;;
     esac
