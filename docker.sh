@@ -13,6 +13,7 @@ NC='\e[0m' # No Color
 
 # Function to show menu
 echo_menu() {
+    clear
     echo -e "${CYAN}Select an option:${NC}"
     echo -e "${GREEN}1) List all running containers${NC}"
     echo -e "${GREEN}2) List all stopped containers${NC}"
@@ -35,30 +36,37 @@ while true; do
     read choice
     case "$choice" in
         1)
+            clear
             echo -e "${GREEN}Listing all running Docker containers...${NC}"
             docker ps
             ;;
         2)
+            clear
             echo -e "${GREEN}Listing all stopped Docker containers...${NC}"
             docker ps -a --filter "status=exited"
             ;;
         3)
+            clear
             echo -e "${GREEN}Listing all Docker volumes...${NC}"
             docker volume ls
             ;;
         4)
+            clear
             echo -e "${YELLOW}Starting all Docker containers...${NC}"
             docker start $(docker ps -aq)
             ;;
         5)
+            clear
             echo -e "${YELLOW}Stopping all Docker containers...${NC}"
             docker stop $(docker ps -q)
             ;;
         6)
+            clear
             echo -e "${YELLOW}Restarting all Docker containers...${NC}"
             docker restart $(docker ps -q)
             ;;
         7)
+            clear
             if [ -n "$(docker ps -aq)" ]; then
                 echo -e "${RED}Removing all stopped containers...${NC}"
                 docker rm $(docker ps -aq)
@@ -67,6 +75,7 @@ while true; do
             fi
             ;;
         8)
+            clear
             if [ -n "$(docker volume ls -q)" ]; then
                 echo -e "${RED}Removing all unused Docker volumes...${NC}"
                 docker volume prune -f
@@ -75,6 +84,7 @@ while true; do
             fi
             ;;
         9)
+            clear
             if [ -n "$(docker images -q -f "dangling=true")" ]; then
                 echo -e "${RED}Removing unused Docker images...${NC}"
                 docker image prune -af
@@ -83,10 +93,12 @@ while true; do
             fi
             ;;
         10)
+            clear
             echo -e "${RED}Pruning entire Docker system (containers, networks, images, build cache)...${NC}"
             docker system prune -af
             ;;
         11)
+            clear
             echo -e "${YELLOW}Checking current SELinux status...${NC}"
             sestatus
             echo -e "${YELLOW}Setting SELinux to permissive mode...${NC}"
@@ -99,6 +111,7 @@ while true; do
             reboot
             ;;
         12)
+            clear
             echo -e "${YELLOW}Checking for script updates...${NC}"
             SCRIPT_PATH=$(realpath "$0")
             LOCAL_HASH=$(sha256sum "$SCRIPT_PATH" | awk '{print $1}')
@@ -114,10 +127,12 @@ while true; do
             fi
             ;;
         0)
+            clear
             echo -e "${BLUE}Exiting...${NC}"
             exit 0
             ;;
         *)
+            clear
             echo -e "${RED}Invalid option. Please try again.${NC}"
             ;;
     esac
