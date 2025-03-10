@@ -25,6 +25,7 @@ echo_menu() {
     echo -e "${RED}9) Clean unused Docker images${NC}"
     echo -e "${RED}10) Prune entire Docker system${NC}"
     echo -e "${YELLOW}11) Reboot system & configure SELinux & restart Nginx${NC}"
+    echo -e "${YELLOW}12) Update this script${NC}"
     echo -e "${BLUE}0) Exit${NC}"
     echo -ne "${CYAN}Enter your choice: ${NC}"
 }
@@ -96,6 +97,21 @@ while true; do
             systemctl restart nginx
             echo -e "${YELLOW}Rebooting system...${NC}"
             reboot
+            ;;
+        12)
+            echo -e "${YELLOW}Checking for script updates...${NC}"
+            SCRIPT_PATH=$(realpath "$0")
+            LOCAL_HASH=$(sha256sum "$SCRIPT_PATH" | awk '{print $1}')
+            REMOTE_HASH=$(curl -sL "https://raw.githubusercontent.com/nitish969k/docker/refs/heads/main/docker.sh" | sha256sum | awk '{print $1}')
+            
+            if [ "$LOCAL_HASH" == "$REMOTE_HASH" ]; then
+                echo -e "${GREEN}Script is already up to date.${NC}"
+            else
+                echo -e "${YELLOW}Updating script...${NC}"
+                curl -o "$SCRIPT_PATH" "https://raw.githubusercontent.com/nitish969k/docker/refs/heads/main/docker.sh" && chmod +x "$SCRIPT_PATH"
+                echo -e "${GREEN}Script updated successfully. Restarting...${NC}"
+                exec "$SCRIPT_PATH"
+            fi
             ;;
         0)
             echo -e "${BLUE}Exiting...${NC}"
