@@ -11,6 +11,30 @@ BLUE='\e[34m'
 CYAN='\e[36m'
 NC='\e[0m' # No Color
 
+# Function to update script
+update_script() {
+    clear
+    echo -e "${YELLOW}Checking for script updates...${NC}"
+    SCRIPT_PATH=$(realpath "$0")
+    TEMP_SCRIPT="/tmp/docker_update.sh"
+
+    # Fetch and hash the remote script
+    curl -sL "https://raw.githubusercontent.com/nitish969k/docker/refs/heads/main/docker.sh" -o "$TEMP_SCRIPT"
+    REMOTE_HASH=$(sha256sum "$TEMP_SCRIPT" | awk '{print $1}')
+    LOCAL_HASH=$(sha256sum "$SCRIPT_PATH" | awk '{print $1}')
+
+    if [ "$LOCAL_HASH" == "$REMOTE_HASH" ]; then
+        echo -e "${GREEN}Script is already up to date.${NC}"
+        rm -f "$TEMP_SCRIPT"
+    else
+        echo -e "${YELLOW}Updating script...${NC}"
+        mv "$TEMP_SCRIPT" "$SCRIPT_PATH"
+        chmod +x "$SCRIPT_PATH"
+        echo -e "${GREEN}Script updated successfully. Restarting...${NC}"
+        exec "$SCRIPT_PATH"
+    fi
+}
+
 # Function to show menu
 echo_menu() {
     clear
@@ -111,20 +135,7 @@ while true; do
             reboot
             ;;
         12)
-            clear
-            echo -e "${YELLOW}Checking for script updates...${NC}"
-            SCRIPT_PATH=$(realpath "$0")
-            LOCAL_HASH=$(sha256sum "$SCRIPT_PATH" | awk '{print $1}')
-            REMOTE_HASH=$(curl -sL "https://raw.githubusercontent.com/nitish969k/docker/refs/heads/main/docker.sh" | sha256sum | awk '{print $1}')
-            
-            if [ "$LOCAL_HASH" == "$REMOTE_HASH" ]; then
-                echo -e "${GREEN}Script is already up to date.${NC}"
-            else
-                echo -e "${YELLOW}Updating script...${NC}"
-                curl -o "$SCRIPT_PATH" "https://raw.githubusercontent.com/nitish969k/docker/refs/heads/main/docker.sh" && chmod +x "$SCRIPT_PATH"
-                echo -e "${GREEN}Script updated successfully. Restarting...${NC}"
-                exec "$SCRIPT_PATH"
-            fi
+            update_script
             ;;
         0)
             clear
