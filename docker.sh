@@ -133,7 +133,7 @@ while true; do
             echo -e "${YELLOW}Restarting Nginx service...${NC}"
             systemctl restart nginx
             echo -e "${YELLOW}Rebooting system...${NC}"
-            reboot
+            #reboot
             ;;
         12)
             update_script
