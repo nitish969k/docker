@@ -93,7 +93,8 @@ while true; do
             #clear
             if [ -n "$(docker ps -aq)" ]; then
                 echo -e "${RED}Removing all stopped containers...${NC}"
-                docker rm $(docker ps -aq)
+                #docker rm $(docker ps -aq)
+                docker system prune -af
             else
                 echo -e "${CYAN}No stopped containers to remove.${NC}"
             fi
