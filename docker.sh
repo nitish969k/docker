@@ -47,8 +47,9 @@ echo_menu() {
     echo -e "${RED}9) Remove all unused Docker volumes${NC}"
     echo -e "${RED}10) Clean unused Docker images${NC}"
     echo -e "${RED}11) Prune entire Docker system${NC}"
-    echo -e "${YELLOW}12) Configure SELinux & restart Nginx${NC}"
-    echo -e "${YELLOW}13) Update this script${NC}"
+    echo -e "${RED}12) Clear Docker build cache${NC}"
+    echo -e "${YELLOW}13) Configure SELinux & restart Nginx${NC}"
+    echo -e "${YELLOW}14) Update this script${NC}"
     echo -e "${BLUE}0) Exit${NC}"
     echo -ne "${CYAN}Enter your choice: ${NC}"
 }
@@ -126,6 +127,10 @@ while true; do
             docker system prune -af
             ;;
         12)
+            echo -e "${RED}Clearing Docker build cache...${NC}"
+            docker builder prune -af
+            ;;
+        13)
             echo -e "${YELLOW}Checking current SELinux status...${NC}"
             sestatus
             echo -e "${YELLOW}Setting SELinux to permissive mode...${NC}"
@@ -135,7 +140,7 @@ while true; do
             echo -e "${YELLOW}Restarting Nginx service...${NC}"
             systemctl restart nginx
             ;;
-        13)
+        14)
             update_script
             ;;
         0)
