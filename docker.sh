@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# #clear screen before starting
+# Clear screen before starting
 clear
 
 # Define colors
@@ -13,13 +13,11 @@ NC='\e[0m' # No Color
 
 # Function to update script
 update_script() {
-    #clear
     echo -e "${YELLOW}Checking for script updates...${NC}"
     SCRIPT_PATH=$(realpath "$0")
     TEMP_SCRIPT="/tmp/docker_update.sh"
 
-    # Fetch and hash the remote script
-    curl -sL "https://raw.githubusercontent.com/nitish969k/docker/refs/heads/main/docker.sh" -o "$TEMP_SCRIPT"
+    curl -sL "https://raw.githubusercontent.com/nitish969k/docker/main/docker.sh" -o "$TEMP_SCRIPT"
     REMOTE_HASH=$(sha256sum "$TEMP_SCRIPT" | awk '{print $1}')
     LOCAL_HASH=$(sha256sum "$SCRIPT_PATH" | awk '{print $1}')
 
@@ -37,20 +35,20 @@ update_script() {
 
 # Function to show menu
 echo_menu() {
-    #clear
     echo -e "${CYAN}Select an option:${NC}"
     echo -e "${GREEN}1) List all running containers${NC}"
     echo -e "${GREEN}2) List all stopped containers${NC}"
     echo -e "${GREEN}3) List all Docker volumes${NC}"
-    echo -e "${YELLOW}4) Start all containers${NC}"
-    echo -e "${YELLOW}5) Stop all running containers${NC}"
-    echo -e "${YELLOW}6) Restart all running containers${NC}"
-    echo -e "${RED}7) Remove all stopped containers${NC}"
-    echo -e "${RED}8) Remove all unused Docker volumes${NC}"
-    echo -e "${RED}9) Clean unused Docker images${NC}"
-    echo -e "${RED}10) Prune entire Docker system${NC}"
-    echo -e "${YELLOW}11) Reboot system & configure SELinux & restart Nginx${NC}"
-    echo -e "${YELLOW}12) Update this script${NC}"
+    echo -e "${GREEN}4) Show disk usage by containers, volumes, and images${NC}"
+    echo -e "${YELLOW}5) Start all containers${NC}"
+    echo -e "${YELLOW}6) Stop all running containers${NC}"
+    echo -e "${YELLOW}7) Restart all running containers${NC}"
+    echo -e "${RED}8) Remove all stopped containers${NC}"
+    echo -e "${RED}9) Remove all unused Docker volumes${NC}"
+    echo -e "${RED}10) Clean unused Docker images${NC}"
+    echo -e "${RED}11) Prune entire Docker system${NC}"
+    echo -e "${YELLOW}12) Configure SELinux & restart Nginx${NC}"
+    echo -e "${YELLOW}13) Update this script${NC}"
     echo -e "${BLUE}0) Exit${NC}"
     echo -ne "${CYAN}Enter your choice: ${NC}"
 }
@@ -60,47 +58,54 @@ while true; do
     read choice
     case "$choice" in
         1)
-            #clear
             echo -e "${GREEN}Listing all running Docker containers...${NC}"
             docker ps
             ;;
         2)
-            #clear
             echo -e "${GREEN}Listing all stopped Docker containers...${NC}"
             docker ps -a --filter "status=exited"
             ;;
         3)
-            #clear
             echo -e "${GREEN}Listing all Docker volumes...${NC}"
             docker volume ls
             ;;
         4)
-            #clear
-            echo -e "${YELLOW}Starting all Docker containers...${NC}"
-            docker start $(docker ps -aq)
+            echo -e "${GREEN}Showing disk usage by containers, volumes, and images...${NC}"
+            docker system df
             ;;
         5)
-            #clear
-            echo -e "${YELLOW}Stopping all Docker containers...${NC}"
-            docker stop $(docker ps -q)
+            if [ -n "$(docker ps -aq)" ]; then
+                echo -e "${YELLOW}Starting all Docker containers...${NC}"
+                docker start $(docker ps -aq)
+            else
+                echo -e "${CYAN}No containers to start.${NC}"
+            fi
             ;;
         6)
-            #clear
-            echo -e "${YELLOW}Restarting all Docker containers...${NC}"
-            docker restart $(docker ps -q)
+            if [ -n "$(docker ps -q)" ]; then
+                echo -e "${YELLOW}Stopping all Docker containers...${NC}"
+                docker stop $(docker ps -q)
+            else
+                echo -e "${CYAN}No running containers to stop.${NC}"
+            fi
             ;;
         7)
-            #clear
+            if [ -n "$(docker ps -q)" ]; then
+                echo -e "${YELLOW}Restarting all Docker containers...${NC}"
+                docker restart $(docker ps -q)
+            else
+                echo -e "${CYAN}No running containers to restart.${NC}"
+            fi
+            ;;
+        8)
             if [ -n "$(docker ps -aq)" ]; then
                 echo -e "${RED}Removing all stopped containers...${NC}"
-                #docker rm $(docker ps -aq)
                 docker system prune -af
             else
                 echo -e "${CYAN}No stopped containers to remove.${NC}"
             fi
             ;;
-        8)
-            #clear
+        9)
             if [ -n "$(docker volume ls -q)" ]; then
                 echo -e "${RED}Removing all unused Docker volumes...${NC}"
                 docker volume prune -f
@@ -108,8 +113,7 @@ while true; do
                 echo -e "${CYAN}No unused volumes to remove.${NC}"
             fi
             ;;
-        9)
-            #clear
+        10)
             if [ -n "$(docker images -q -f "dangling=true")" ]; then
                 echo -e "${RED}Removing unused Docker images...${NC}"
                 docker image prune -af
@@ -117,13 +121,11 @@ while true; do
                 echo -e "${CYAN}No unused images to remove.${NC}"
             fi
             ;;
-        10)
-            #clear
+        11)
             echo -e "${RED}Pruning entire Docker system (containers, networks, images, build cache)...${NC}"
             docker system prune -af
             ;;
-        11)
-            #clear
+        12)
             echo -e "${YELLOW}Checking current SELinux status...${NC}"
             sestatus
             echo -e "${YELLOW}Setting SELinux to permissive mode...${NC}"
@@ -132,19 +134,15 @@ while true; do
             sestatus
             echo -e "${YELLOW}Restarting Nginx service...${NC}"
             systemctl restart nginx
-            echo -e "${YELLOW}Rebooting system...${NC}"
-            #reboot
             ;;
-        12)
+        13)
             update_script
             ;;
         0)
-            #clear
             echo -e "${BLUE}Exiting...${NC}"
             exit 0
             ;;
         *)
-            #clear
             echo -e "${RED}Invalid option. Please try again.${NC}"
             ;;
     esac
